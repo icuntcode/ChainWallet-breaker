@@ -90,8 +90,7 @@ def main():
 	"""
 	Create the main pipeline by using an infinite loop to repeatedly call the 
 	functions, while utilizing multiprocessing from __main__. Because all the 
-	functions are relatively
-	fast, it is better to combine them all into 
+	functions are relatively fast, it is better to combine them all into 
 	one process.
 	"""
 
