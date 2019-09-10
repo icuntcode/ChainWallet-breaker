@@ -11,13 +11,17 @@ import itertools
 import string
 import hashlib
 import random
+import sys
 from timeit import default_timer as timer
 from ellipticcurve.privateKey import PrivateKey
 
 PASSWORD_LENGTH=6
 DEFAULT_PASSWORD=''                     # The program will use DEFAULT_PASSWORD, if set, to start brute-forcing, then continue with the rest of possible passwords
-MIN_POWER=2                             # Min base and exp to be checked 2^2 = 
-MAX_POWER=10                            # Max base and exp to be checked 9^9 = 
+MIN_POWER=2                             # Min base and exp to be checked :     2^2
+MAX_POWER=10                            # Max base and exp to be checked -1 :  9^9
+
+
+VALID_MODES = {'r','e', 'R','E'}                           #Modes: Random, Exhaustive
 
 def generate_all_possible_strings(length):
         """
@@ -97,43 +101,88 @@ def generate_random(size=PASSWORD_LENGTH, chars=string.ascii_lowercase):
         return ''.join(random.choice(chars) for _ in range(size))                                       # Source: https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits/23728630#23728630
 
 if __name__ == '__main__':
+
+        mode = input("Select a mode - Random (r/R) or Exhaustive (e/E): ")
+        if mode not in VALID_MODES:
+                exit(-1)
+      
         used_words=[]
         password=''
         process_info()
-        while True:
-                all_exps = (i**exp for exp in range(MIN_POWER,MAX_POWER) for i in range(MIN_POWER,MAX_POWER))
-                timer_count=0                                                                           # timer set to zero
+
+        if mode=='r' or mode=='R':                                                                              # RANDOM MODE: Will test random 6 letter passwords
 
 
-                if DEFAULT_PASSWORD=='' or password in used_words:
-                        password=generate_random()
-                else:         
-                        password=DEFAULT_PASSWORD
-                        print('Using input password: ',password) 
+                # Ask user if they are feeling lucky for a DEFAULT_PASSWORD
+                DEFAULT_PASSWORD = input("Insert a first password to be tested (if you feel lucky): ")
+                
+                while True:
+                        print('Running in random mode')
+                        all_exps = (i**exp for exp in range(MIN_POWER,MAX_POWER) for i in range(MIN_POWER,MAX_POWER))
+                        timer_count=0                                                                           # timer set to zero
 
-                used_words.append(password)
-                print('Current password: ',password)  
-                for current in all_exps:
-                                start = timer()
-                                print('SHA256 times: ',current)
-                                private_key = sha256_ntimes(password,current)
-                                public_key = private_key_to_public_key(private_key)
-                                address = public_key_to_address(public_key)
-                                end = timer()
 
-                                ### DEBUG: Simple password to test it works ###
-                                ### password 'aaaaac'
-                                ### address == 1DFe1d61VPqCDZfJ35rnRRUhuqSDg5s59z
-                                
-                                if address == '12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH':                     # Chainwallet wallet https://www.blockchain.com/btc/address/12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH
-                                                with open('results.txt', 'a') as file:
-                                                                file.write('power: ' + str(current) + '\n' +
-                                                                                   'password:' + str(password) + '\n' +
-                                                                                   'WIF private key: ' + str(private_key_to_WIF(private_key)) + '\n' +
-                                                                                   'address: ' + str(address) + '\n\n')
-                                                exit(0)
-                                timer_count+= (end-start)
-                print('Total time: %.2f.' %timer_count)
+                        if DEFAULT_PASSWORD=='' or password in used_words:
+                                password=generate_random()
+                        else:         
+                                password=DEFAULT_PASSWORD.lower()
+                                print('Using input password: ',password) 
 
-##                ### DEBUG: Uncomment to see words used while running ###
-####                print('Words used: ',*used_words,'\n')
+                        used_words.append(password)
+                        print('Current password: ',password)  
+                        for current in all_exps:
+                                        start = timer()
+                                        print('SHA256 times: ',current)
+                                        private_key = sha256_ntimes(password,current)
+                                        public_key = private_key_to_public_key(private_key)
+                                        address = public_key_to_address(public_key)
+                                        end = timer()
+
+                                        ### DEBUG: Simple password to test it works ###
+                                        ### password 'aaaaac'
+                                        ### address == 1DFe1d61VPqCDZfJ35rnRRUhuqSDg5s59z
+                                        
+                                        if address == '12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH':                     # Chainwallet wallet https://www.blockchain.com/btc/address/12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH
+                                                        with open('results.txt', 'a') as file:                  # IF FOUND write to file!!!
+                                                                        file.write('power: ' + str(current) + '\n' +
+                                                                                           'password:' + str(password) + '\n' +
+                                                                                           'WIF private key: ' + str(private_key_to_WIF(private_key)) + '\n' +
+                                                                                           'address: ' + str(address) + '\n\n')
+                                                        exit(0)
+                                        timer_count+= (end-start)
+                        print('Total time: %.2f.' %timer_count)
+
+        else:                                                                                                   # EXHAUSTIVE MODE: Will test all 6 letter words from aaaaaa to zzzzz
+                for password in generate_all_possible_strings(PASSWORD_LENGTH):
+                        print('Running in random mode')
+                        all_exps = (i**exp for exp in range(MIN_POWER,MAX_POWER) for i in range(MIN_POWER,MAX_POWER))
+                        timer_count=0                                                                           # timer set to zero
+
+                        used_words.append(password)
+                        print('Current password: ',password)  
+                        for current in all_exps:
+                                        start = timer()
+                                        print('SHA256 times: ',current)
+                                        private_key = sha256_ntimes(password,current)
+                                        public_key = private_key_to_public_key(private_key)
+                                        address = public_key_to_address(public_key)
+                                        end = timer()
+
+                                        ### DEBUG: Simple password to test it works ###
+                                        ### password 'aaaaac'
+                                        ### address == 1DFe1d61VPqCDZfJ35rnRRUhuqSDg5s59z
+                                        
+                                        if address == '12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH':                     # Chainwallet wallet https://www.blockchain.com/btc/address/12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH
+                                                        with open('results.txt', 'a') as file:                  # IF FOUND write to file!!!
+                                                                        file.write('power: ' + str(current) + '\n' +
+                                                                                           'password:' + str(password) + '\n' +
+                                                                                           'WIF private key: ' + str(private_key_to_WIF(private_key)) + '\n' +
+                                                                                           'address: ' + str(address) + '\n\n')
+                                                        exit(0)
+                                        timer_count+= (end-start)
+                        print('Total time: %.2f.' %timer_count)
+                                        
+                        ### DEBUG: Uncomment to see words used while running ###
+                        print('Words used: ',*used_words,'\n')
+
+                        
