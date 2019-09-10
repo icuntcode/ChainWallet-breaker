@@ -1,22 +1,23 @@
 # Chainwallet-breaker
 # https://www.reddit.com/r/Bitcoin/comments/cya467/chainwallet_challenge_get_01_btc_if_you_solve_it/
-#
-# Original code from Plutus Bitcoin Brute Forcer https://github.com/Isaacdelly/Plutus
+# Original Bitcoin functions from from Plutus Bitcoin Brute Forcer: https://github.com/Isaacdelly/Plutus
 #
 # If this helps you -> bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa
  
 
 import os
-import hashlib
 import binascii
-import multiprocessing
 import itertools
 import string
+import hashlib
+import random
 from timeit import default_timer as timer
 from ellipticcurve.privateKey import PrivateKey
 
-length=6
-max_power=5**6+1
+PASSWORD_LENGTH=6
+DEFAULT_PASSWORD=''                     # The program will use DEFAULT_PASSWORD, if set, to start brute-forcing, then continue with the rest of possible passwords
+MIN_POWER=2                             # Min base and exp to be checked 2^2 = 
+MAX_POWER=10                            # Max base and exp to be checked 9^9 = 
 
 def generate_all_possible_strings(length):
         """
@@ -82,50 +83,57 @@ def private_key_to_WIF(private_key):
 	return chars[0] * pad + result
 
 def process_info():
-    print('module name:', __name__)
+    print('Running:', __name__)
     print('parent process:', os.getppid())
     print('process id:', os.getpid())
+    
+def sha256_ntimes(password, times):
+    for i in range(times):
+        private_key = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        password=private_key
+    return private_key
 
-def main():
-	"""
-	Create the main pipeline by using an infinite loop to repeatedly call the 
-	functions, while utilizing multiprocessing from __main__. Because all the 
-	functions are relatively fast, it is better to combine them all into 
-	one process.
-	"""
-
-####DEBUG password='aaaabc' and power 2^10 = 1024 rounds of sha256 -> address: 1GxVzZQMSH58D5Jf5M3tNBW7kczju8VHEW
-##password='aaaaac'
-##for x in range(0, 1024+1):
-##        private_key = hashlib.sha256(password.encode('utf-8')).hexdigest()
-##        password=private_key
-##        if x==1024:
-##                public_key = private_key_to_public_key(private_key) 	
-##                address = public_key_to_address(public_key)
-##                print('Address:',address)
-
-process_info()
-print('Generating ',max_power, 'rounds of sha256 for all ',length,' lowercase letter passwords')
-print(max_power*26**length,' possibilities. This will take a while...')
-	
-for password in generate_all_possible_strings(length):
-        print('Current password: ',password)
-##      start = timer()                                                                 # Debug: Time between password cycles
-        for x in range(0, max_power):
-                private_key = hashlib.sha256(password.encode('utf-8')).hexdigest()      # One round of sha256(password)
-                public_key = private_key_to_public_key(private_key)
-                address = public_key_to_address(public_key)
-                
-                if address == '12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH':                     # Chainwallet wallet https://www.blockchain.com/btc/address/12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH
-                        print('Power: ',x)
-                        print('Password: ',password)
-                        print('WIF: ', private_key_to_WIF(private_key))
-                        print('Address: ',address)
-                        exit(0)
-                password=private_key
-##        end = timer()
-##        print(end - start)
+def generate_random(size=PASSWORD_LENGTH, chars=string.ascii_lowercase):
+        return ''.join(random.choice(chars) for _ in range(size))                                       # Source: https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits/23728630#23728630
 
 if __name__ == '__main__':
-        for cpu in range(multiprocessing.cpu_count()):
-                multiprocessing.Process(target = main, args=()).start()
+        used_words=[]
+        password=''
+        process_info()
+        while True:
+                all_exps = (i**exp for exp in range(MIN_POWER,MAX_POWER) for i in range(MIN_POWER,MAX_POWER))
+                timer_count=0                                                                           # timer set to zero
+
+
+                if DEFAULT_PASSWORD=='' or password in used_words:
+                        password=generate_random()
+                else:         
+                        password=DEFAULT_PASSWORD
+                        print('Using input password: ',password) 
+
+                used_words.append(password)
+                print('Current password: ',password)  
+                for current in all_exps:
+                                start = timer()
+                                print('SHA256 times: ',current)
+                                private_key = sha256_ntimes(password,current)
+                                public_key = private_key_to_public_key(private_key)
+                                address = public_key_to_address(public_key)
+                                end = timer()
+
+                                ### DEBUG: Simple password to test it works ###
+                                ### password 'aaaaac'
+                                ### address == 1DFe1d61VPqCDZfJ35rnRRUhuqSDg5s59z
+                                
+                                if address == '12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH':                     # Chainwallet wallet https://www.blockchain.com/btc/address/12FnVGpLqxmPTfENdyBso9HNbEdQEiHuhH
+                                                with open('results.txt', 'a') as file:
+                                                                file.write('power: ' + str(current) + '\n' +
+                                                                                   'password:' + str(password) + '\n' +
+                                                                                   'WIF private key: ' + str(private_key_to_WIF(private_key)) + '\n' +
+                                                                                   'address: ' + str(address) + '\n\n')
+                                                exit(0)
+                                timer_count+= (end-start)
+                print('Total time: %.2f.' %timer_count)
+
+##                ### DEBUG: Uncomment to see words used while running ###
+####                print('Words used: ',*used_words,'\n')
