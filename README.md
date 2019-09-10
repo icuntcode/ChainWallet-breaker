@@ -7,7 +7,9 @@ Python 3.6 or higher
 
 Requirements: starkbank-ecdsa==0.1.4
 
-If this helps you, send me some sats -> bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa / bitcoin:17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA
+If this helps you, send me some sats:
+bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa (Bech32 Segwit forever!)
+bitcoin:17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA (Legacy address)
 
 09/10: v0.2 - New version that will try generating random 6 letter passwords
 
