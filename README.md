@@ -9,7 +9,7 @@ Requirements: starkbank-ecdsa==0.1.4
 
 ----------------------------
 
-If this helps you, send me some sats:
+**If this helps you, send me some sats :)**
 
 bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa (Bech32 Segwit forever!)
 
