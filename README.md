@@ -18,7 +18,10 @@ bitcoin:17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA (Legacy address)
 ----------------------------
 
 09/10: v0.2 - New version that will try generating random 6 letter passwords
-09/10 (later that same day): v0.3 - New version has two modes RANDOM (will test random 6 letter words) or EXHAUSTIVE (test all the 6 letter passwords!!!). Users can also input a DEFAULT_PASSWORD in RANDOM mode.
+
+09/10 (later that same day): v0.3
+- New version has two modes RANDOM (will test random 6 letter words) or EXHAUSTIVE (test all the 6 letter passwords!!!).
+- Users can also input a DEFAULT_PASSWORD in RANDOM mode.
 
 ## TODO
 - ~Include exhaustive method (test all possibilities) back into the application~ Done
