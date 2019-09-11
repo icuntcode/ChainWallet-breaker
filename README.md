@@ -3,11 +3,13 @@ https://www.reddit.com/r/Bitcoin/comments/cya467/chainwallet_challenge_get_01_bt
 
 Original code taken from Plutus Bitcoin Brute Forcer https://github.com/Isaacdelly/Plutus
 
+## Dependencies
+
 Python 3.6 or higher
 
 Requirements: starkbank-ecdsa==0.1.4
 
-----------------------------
+## Donate
 
 **If this helps you, send me some sats :)**
 
