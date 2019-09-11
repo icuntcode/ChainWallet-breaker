@@ -11,9 +11,9 @@ Requirements: starkbank-ecdsa==0.1.4
 
 **If this helps you, send me some sats :)**
 
-bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa (Bech32 Segwit forever!)
+[bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa](bitcoin:bc1qamzgt95xwgtz504hcn6lvnam6yumnepqtrsmsa) (Bech32 Segwit forever!)
 
-bitcoin:17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA (Legacy address)
+[17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA](bitcoin:17fW9XDHFTmF5Xkk5TabpwY66w34jCX6QA) (Legacy address)
 
 ----------------------------
 
